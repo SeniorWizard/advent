@@ -48,17 +48,24 @@ while (<IN>) {
 my $item;
 my $throwto = -1;
 my $round = 0;
+my $factor=1;
+for ($mid = 0; $mid < scalar(@monkey); $mid++) {
+	$factor *= $monkey[$mid]->[3];
+}
 
-while (++$round <= 20 ) {
+#round1 is 20 rounds
+#while (++$round <= 20 ) {
+while (++$round <= 10000 ) {
 	for ($mid = 0; $mid < scalar(@monkey); $mid++) {
-		#foreach $item (@{$monkey[$mid]->[0]}) {
 		while ($item = shift @{$monkey[$mid]->[0]} ) {
 			#activity
 			$monkey[$mid]->[6]++;
 			#operate
 			$item = eval("$item $monkey[$mid]->[1] $monkey[$mid]->[2]");
-			# unworry
-			$item = int($item / 3);
+			# unworry only in round1
+			#$item = int($item / 3);
+			#avoid going byond the product of the divisors
+			$item = ($item % $factor);
 			#test
 			if ( $item % $monkey[$mid]->[3] == 0 ) {
 				#true

@@ -8,9 +8,7 @@ my $input = 'i10.txt';
 open(IN, "$input") || die "cant read $input: $!\n";
 
 #print Dumper(@head);
-my @val = (1);
 my @v = (1);
-my $cycle = 0;
 my $sum = 0;
 
 while (<IN>) {
@@ -23,6 +21,18 @@ while (<IN>) {
 	}
 }
 printf("sum of interesting frequencies %i\n", $sum);
+my $cycle = 0;
+foreach my $val (@v) {
+	my $pos = $cycle++ % 40;
+	if ( abs($val - $pos) < 2  ) {
+		print "#";
+	} else {
+		print ".";
+ 	}
+	if ($cycle%40 == 0) {
+		print "\n";
+	}
+}
 
 sub addreg () {
 	my $add = shift;

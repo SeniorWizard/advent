@@ -31,6 +31,7 @@ while (<IN>) {
 	$y++;
 }
 my %Graph;
+my @lows = ();
 #lets make a graph
 for (my $i=0; $i < $x; $i++) {
 	for (my $j=0; $j < $y; $j++) {
@@ -50,46 +51,56 @@ for (my $i=0; $i < $x; $i++) {
 		if ($j + 1 <= $y && $map[$i][$j+1] <= $map[$i][$j] + 1 ) {
 			push @{$Graph{ node($i, $j) }} , node($i, $j+1);
 		}
-	}
-}
-
-
-my %Dist;
-my %Prev;
-
-foreach (keys %Graph) {
-	$Dist{$_} =  2*$x*$y;
-	$Prev{$_} = $_;
-}
-$Dist{ node(@start) } = 0;
-
-while ($Dist{ node(@end) } == 2*$x*$y) {
-	foreach my $n1 ( sort keys %Graph ) {
-		foreach my $n2 ( @{$Graph{$n1}} ) {
-			if ( $Dist{$n2} > $Dist{$n1} + 1 ) {
-				#shorter path
-				$Dist{$n2} = $Dist{$n1} + 1;
-				$Prev{$n2} = $n1;
-			}
+		if ( $map[$i][$j] == 1 ) {
+			push @lows, [ $i, $j ];
 		}
 	}
 }
 
-printf("Shortest path: %i\n", $Dist{ node(@end) } );
+my $hike;
+my $minhike = 2*$x*$y;
+foreach (@lows) {
+	@start = @{$_};
+	$hike = dijkstra(@start);
+	$minhike = $hike if ( $minhike > $hike );
+	printf("Shortest path from (%i,%i): %i\n", @start, $hike );
+}
+
+printf("Shortest hike to the top is: %i\n", $minhike );
+
+
+sub dijkstra () {
+	my @s = ($_[0],$_[1]);
+	my %Dist;
+	my %Prev;
+
+	foreach (keys %Graph) {
+		$Dist{$_} =  2*$x*$y;
+		$Prev{$_} = $_;
+	}
+	$Dist{ node(@s) } = 0;
+
+	my $updates = 1;
+	while ($Dist{ node(@end) } == 2*$x*$y && $updates > 0) {
+		$updates = 0;
+		foreach my $n1 ( sort keys %Graph ) {
+			foreach my $n2 ( @{$Graph{$n1}} ) {
+				if ( $Dist{$n2} > $Dist{$n1} + 1 ) {
+					#shorter path
+					$Dist{$n2} = $Dist{$n1} + 1;
+					$Prev{$n2} = $n1;
+					$updates++;
+				}
+			}
+		}
+	}
+	return $Dist{ node(@end) };
+}
+
 
 sub node () {
 	return sprintf("%i_%i", @_);
 }
-
-sub nodesleft () {
-	my $h = shift;
-	my $cnt = 0;
-	foreach (keys %{$h}) {
-		$cnt++ if (${$h}{$_} == 2*$x*$y);
-	}
-	return $cnt;
-}
-			
 
 
  

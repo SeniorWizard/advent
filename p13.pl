@@ -21,17 +21,30 @@ push @list, [@pair];
 
 my $idx = 0;
 my $sum = 0;
+#1 beeing packet type ie divider
+my @packets = ( [1,[[2]]], [1,[[6]]] );
 foreach my $r (@list) {
 	$idx++;
 	#print $idx, compair(@$r), ":", "\n" ; #, Dumper(@pair);
+	push @packets, ([0,$r->[0]], [0,$r->[1]]);
 	if (compair(@$r) > 0) {
-		#print "Undorderd\n";
 	} else {
-		#print "Orderd\n";
 		$sum += $idx;
 	}
 }
 printf("Sum of indces of ordered pairs is: %i\n", $sum);
+#part 2
+$idx = 1;
+my $code = 1;
+foreach (sort {compair($a->[1],$b->[1])} @packets) {
+	if ( $_->[0] == 1 ) {
+		#print "Found at $idx\n";
+		$code *= $idx;
+	}
+	$idx++;
+}
+printf("Product of indces of dividers is: %i\n", $code);
+	
 
 
 sub compair {

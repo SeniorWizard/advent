@@ -45,7 +45,7 @@ my $maxy = 0;
 my $maxx = $#map + 1;
 foreach (@map) {
 	if ( defined($_) ) {
-		$maxy = max($maxy, $#{$_} + 1);
+		$maxy = max($maxy, $#{$_});
 	} else {
 		$minx++
 	}
@@ -53,8 +53,16 @@ foreach (@map) {
 
 printf( "boundaries %i < x < %i, y < %i\n", $minx, $maxx, $maxy);
 
+#part 2 add the floor
+$maxy += 2;
+$minx -= $maxy;
+$maxx += $maxy;
 
-#print Dumper(@map);
+foreach( $minx..$maxx ) {
+	$map[$_][$maxy] = 1;
+}
+
+
 printmap(\@map);
 my $sand = 0;
 while ( dropsand(\@map) ) {
@@ -78,7 +86,7 @@ sub isfree {
 sub dropsand {
 	my $m = shift;
 	my $x = 500;
-	my $y = 1;
+	my $y = 0;
 	my $drop = 1;
 	while ($drop) {
 		if ($x >= $minx && $x <= $maxx && $y <= $maxy ) { 
@@ -97,6 +105,9 @@ sub dropsand {
 				#no movement possible
 				$m->[$x][$y] = 2;
 				$drop = 0;
+				if ( $x==500 && $y==0) {
+					return 0;
+				}
 			}
 		} else {
 			#free fall
